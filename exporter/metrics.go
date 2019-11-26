@@ -20,6 +20,7 @@ import (
 	"github.com/fstab/grok_exporter/oniguruma"
 	"github.com/fstab/grok_exporter/template"
 	"github.com/prometheus/client_golang/prometheus"
+	"net/url"
 	"strconv"
 	"time"
 )
@@ -491,7 +492,12 @@ func labelValues(metricName string, searchResult *oniguruma.SearchResult, templa
 		if err != nil {
 			return nil, fmt.Errorf("error processing metric %v: %v", metricName, err.Error())
 		}
-		result[t.Name()] = value
+		//result[t.Name()] = value # 
+		value_, err = url.QueryUnescape(value)
+		if err != nil {
+			return nil, fmt.Errorf("Unable to perform URL decode on value %v: %v", metricName, err.Error())
+		}
+		result[t.Name()] = value_
 	}
 	return result, nil
 }
